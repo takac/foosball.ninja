@@ -6,8 +6,11 @@
 </head>
 <body>
 <h1>{{player.name}}</h1>
-{{#scores}}
-<li>{{player.name}} {{player_score}} - {{opponent_score}} {{opponent.name}}</li>
-{{/scores}}
+<ul>
+    {% for score in scores %}
+    <li>{{player.name}} {{score.player_score}} -
+    {{score.opponent_score}} {{score.opponent.name}}</li>
+    {% endfor %}
+</ul>
 </body>
 </html>

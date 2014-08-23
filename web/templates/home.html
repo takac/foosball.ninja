@@ -7,9 +7,9 @@
 <body>
     <h1>{{title}}</h1>
     <ul>
-    {{#players}}
-    <li><a href="/player/{{id}}">{{name}}</a></li>
-    {{/players}}
+        {% for player in players %}
+        <li><a href="/player/{{player.id}}/{{player.name|lower}}">{{player.name}}</a></li>
+        {% endfor %}
     </ul>
 </body>
 </html>
