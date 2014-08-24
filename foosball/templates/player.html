@@ -1,48 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>{{title}}</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <h1>{{player.name}}</h1>
-    <h3>Scores</h3>
-    <ul>
-        {% for score in scores %}
-        <li>{{player.name}} {{score.player_score}} -
-        {{score.opponent_score}} {{score.opponent.name}}</li>
-        {% endfor %}
-    </ul>
-    <h3>Results: {{result_count}}</h3>
-    <table>
-        <th>
-            <tr>
-                <td>Won</td>
-                <td>Opponent</td>
-                <td>Game date</td>
-            </tr>
-        </th>
-        {% for result in results %}
-        <tr>
-            <td>{{result.won}}</td>
-            <td>{{result.opponent.name}}</td>
-            <td>{{result.gamedate}}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% if  total_pages > 1 %}
-    <p>Page {{ result_page }} of {{ total_pages }}</p>
-    {% if result_page == total_pages %}
-    <a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page - 1 }}'>prev</a>
-    <span>forward</span>
-    {% elif result_page == 1%}
-    <span>prev</span>
-    <a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page + 1 }}'>forward</a>
-    {% else %}
-    <a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page - 1 }}'>prev</a>
-    <a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page + 1 }}'>forward</a>
-    {% endif %}
-    {% endif %}
-    <p><a href="/">Home</a></p>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block body %}
+<h1>{{player.name}}</h1>
+<h3>Scores</h3>
+<table>
+    <tr>
+        <th>Opponent</th>
+        <th>Games Played</th>
+        <th>Won</th>
+        <th>Lost</th>
+        <th>Win percentage</th>
+    </tr>
+    {% for score in scores %}
+    <tr>
+        <td>{{score.opponent.name}}</td>
+        <td>{{score.opponent_score + score.player_score}}</td>
+        <td>{{score.player_score}}</td>
+        <td>{{score.opponent_score}}</td>
+        <td>{{((score.player_score / (score.opponent_score + score.player_score)) * 100)|round(1)}}%</td>
+    </tr>
+    {% endfor %}
+</table>
+<h3>Results: {{result_count}}</h3>
+<table>
+    <tr>
+        <th>Won</th>
+        <th>Opponent</th>
+        <th>Game date</th>
+    </tr>
+    {% for result in results %}
+    <tr>
+        <td>{{result.won}}</td>
+        <td>{{result.opponent.name}}</td>
+        <td>{{result.gamedate}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% if  total_pages > 1 %}
+<p>Page {{ result_page }} of {{ total_pages }}</p>
+{% if result_page == total_pages %}
+<a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page - 1 }}'>prev</a>
+<span>forward</span>
+{% elif result_page == 1%}
+<span>prev</span>
+<a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page + 1 }}'>forward</a>
+{% else %}
+<a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page - 1 }}'>prev</a>
+<a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page + 1 }}'>forward</a>
+{% endif %}
+{% endif %}
+<p><a href="/">Home</a></p>
+{% endblock body %}
