@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>{{player.name}}</h1>
+
+<script>
+window.player_id = {{player.id}};
+</script>
+
+<svg></svg>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<style type="text/css" media="screen">
+.axis path,
+.axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+</style>
+<script src="/static/content.js" type="text/javascript" charset="utf-8"></script>
+{% endblock body %}

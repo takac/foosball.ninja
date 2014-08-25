@@ -7,7 +7,8 @@ from foosball import app
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(app.config['DATABASE'])
+        db = g._database = sqlite3.connect(
+            app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
         db.row_factory = sqlite3.Row
     return db
 
@@ -78,8 +79,8 @@ class FoosDatabase(object):
 
         return self.query_db(result_count_query, player=player)[0][0]
 
-    def results(self, player, offset=0, limit=20):
-        result_query = ('select winner, opponent, gamedate from '
+    def results(self, player, offset=0, limit=20, epoch=False):
+        result_query = ('select winner, opponent, gamedate as "[timestamp]" from '
                         '(select winner, opponent, gamedate '
                         'from game where winner = {{player.id}} union all '
                         'select winner, opponent, gamedate from '
@@ -97,6 +98,7 @@ class FoosDatabase(object):
             else:
                 r['opponent'] = self.player(row['winner'])
                 r['won'] = False
-            r['gamedate'] = row['gamedate']
+            # For some reason col 2 lost its key
+            r['gamedate'] = row[2] if not epoch else row[2].strftime('%s')
             translated_rows.append(r)
         return translated_rows

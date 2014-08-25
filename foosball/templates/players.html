@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>{{title}}</h1>
+<h1>Player List</h1>
 <ul>
     {% for player in players %}
     <li><a href="/player/{{player.id}}/{{player.name|lower}}">{{player.name}}</a></li>

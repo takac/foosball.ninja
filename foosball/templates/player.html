@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block extra_heading %}
+<li><a href="/player/{{player.id}}/graph">Graph</a></li>
+{% endblock extra_heading %}
 {% block body %}
 <h1>{{player.name}}</h1>
 <h3>Scores</h3>
@@ -48,5 +51,4 @@
 <a href='/player/{{player.id}}/{{player.name|lower}}?page={{ result_page + 1 }}'>forward</a>
 {% endif %}
 {% endif %}
-<p><a href="/">Home</a></p>
 {% endblock body %}

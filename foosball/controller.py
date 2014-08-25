@@ -9,11 +9,25 @@ blueprint = flask.Blueprint('main', __name__)
 @blueprint.route('/')
 def home():
     return flask.render_template(
-        'home.html', players=db.players(), title='FOOS')
+        'players.html', players=db.players(), title='FOOS', page_name='home')
 
 
-@blueprint.route('/player/<int:player_id>/<string:name>')
-@blueprint.route('/player/<int:player_id>')
+@blueprint.route('/player/<int:player_id>/results.json')
+def player_results(player_id):
+    player = db.player(player_id)
+    result_count = db.result_count(player)
+    results = {'results': db.results(player, offset=0, limit=result_count, epoch=True)}
+    return flask.jsonify(results)
+
+
+@blueprint.route('/player/<int:player_id>/graph/')
+def player_graph(player_id):
+    return flask.render_template('cumlativegraph.html',
+        player=db.player(player_id), title='FOOS');
+
+
+@blueprint.route('/player/<int:player_id>/<string:name>/')
+@blueprint.route('/player/<int:player_id>/')
 def player(player_id, name=None):
     result_page = int(flask.request.args.get('page', '1'))
     page_size = 10
