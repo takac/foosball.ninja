@@ -1,29 +1,33 @@
 import sqlite3
+import logging
 import jinja2
 from flask import g
-from foosball import app
 
-
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(
-            app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
-        db.row_factory = sqlite3.Row
-    return db
-
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
+logger = logging.getLogger(__name__)
 
 class FoosDatabase(object):
+    def __init__(self, app):
+        self.app = app
+
+        @app.teardown_appcontext
+        def close_connection(exception):
+            db = getattr(g, '_database', None)
+            if db is not None:
+                logger.debug('closing db connection')
+                db.close()
+
+    def get_db(self):
+        db = getattr(g, '_database', None)
+        if db is None:
+            logger.debug('creating db connection')
+            db = g._database = sqlite3.connect(
+                self.app.config['DATABASE'], detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+            db.row_factory = sqlite3.Row
+        return db
+    
 
     def query_db(self, query, *args, **kwargs):
-        cursor = get_db().cursor()
+        cursor = self.get_db().cursor()
         q = jinja2.Template(query).render(*args, **kwargs)
         cursor.execute(q)
         rv = cursor.fetchall()
@@ -46,7 +50,7 @@ class FoosDatabase(object):
         return (score_one[0], score_two[0])
 
     def player(self, id):
-        cursor = get_db().cursor()
+        cursor = self.get_db().cursor()
         player_query = 'SELECT name FROM player WHERE id = {}'.format(id)
         cursor.execute(player_query)
         return {'name': cursor.fetchone()[0], 'id': id}

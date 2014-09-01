@@ -1,44 +1,46 @@
 #!/usr/bin/python
 import flask
-from foosball import db
+import logging
+import foosball.blueprint
 
-blueprint = flask.Blueprint('main', __name__)
+logger = logging.getLogger(__name__)
 
+controller = foosball.blueprint.Blueprint('main', __name__)
 
 # Handler for the GET requests
-@blueprint.route('/')
+@controller.route('/')
 def home():
     return flask.render_template(
-        'players.html', players=db.players(), title='FOOS', page_name='home')
+        'players.html', players=controller.db.players(), title='FOOS', page_name='home')
 
 
-@blueprint.route('/player/<int:player_id>/results.json')
+@controller.route('/player/<int:player_id>/results.json')
 def player_results(player_id):
-    player = db.player(player_id)
-    result_count = db.result_count(player)
-    results = {'results': db.results(player, offset=0, limit=result_count, epoch=True)}
+    player = controller.db.player(player_id)
+    result_count = controller.db.result_count(player)
+    results = {'results': controller.db.results(player, offset=0, limit=result_count, epoch=True)}
     return flask.jsonify(results)
 
 
-@blueprint.route('/player/<int:player_id>/graph/')
+@controller.route('/player/<int:player_id>/graph/')
 def player_graph(player_id):
     return flask.render_template('cumlativegraph.html',
-        player=db.player(player_id), title='FOOS');
+        player=controller.db.player(player_id), title='FOOS');
 
 
-@blueprint.route('/player/<int:player_id>/<string:name>/')
-@blueprint.route('/player/<int:player_id>/')
+@controller.route('/player/<int:player_id>/<string:name>/')
+@controller.route('/player/<int:player_id>/')
 def player(player_id, name=None):
     result_page = int(flask.request.args.get('page', '1'))
     page_size = 10
-    player = db.player(player_id)
+    player = controller.db.player(player_id)
     if name is not None and not name == player['name'].lower():
         raise Exception("name does not match")
 
-    scores = db.scores(player)
+    scores = controller.db.scores(player)
     offset = (result_page-1) * page_size
-    results = db.results(player, offset=offset, limit=page_size)
-    result_count = db.result_count(player)
+    results = controller.db.results(player, offset=offset, limit=page_size)
+    result_count = controller.db.result_count(player)
     total_pages = int(result_count/page_size)
     if result_page < 0 or (total_pages > 1 and result_page > total_pages):
         raise Exception('cant be less than 0')
