@@ -1,0 +1,6 @@
+.git/
+.venv/
+*.pyc
+*.db
+*.log
+*.md
